@@ -2,7 +2,9 @@ package com.peerlift.PeerLift.controller;
 
 import com.peerlift.PeerLift.dto.ApiResponse;
 import com.peerlift.PeerLift.dto.task.RateSubmissionRequest;
+import com.peerlift.PeerLift.dto.task.SubmissionResponse;
 import com.peerlift.PeerLift.entities.Auth.Users;
+import com.peerlift.PeerLift.entities.Task.Submission;
 import com.peerlift.PeerLift.service.task.ImageStorageService;
 import com.peerlift.PeerLift.service.task.TaskService;
 import com.peerlift.PeerLift.utils.SecurityUtil;
@@ -49,4 +51,26 @@ public class SubmissionController {
 		taskService.rateSubmission(taskId, request.rating(), user);
 		return ResponseEntity.ok(new ApiResponse<>(200, "Submission rated", null));
 	}
+
+	@GetMapping("/{taskId}")
+	public ResponseEntity<ApiResponse<SubmissionResponse>> getSubmission(
+		@PathVariable Long taskId
+	) {
+		Users user = SecurityUtil.currentUser();
+
+		Submission submission =
+			taskService.getSubmissionForTask(taskId, user);
+
+		SubmissionResponse response = new SubmissionResponse(
+			taskId,
+			submission.getSubmittedBy().getUsername(),
+			submission.getImageUrls(),
+			submission.getRating()
+		);
+
+		return ResponseEntity.ok(
+			new ApiResponse<>(200, "Submission fetched", response)
+		);
+	}
+
 }

@@ -123,5 +123,18 @@ public class TaskService {
 		userRepo.save(solver);
 	}
 
+	public Submission getSubmissionForTask(Long taskId, Users requester) {
+
+		Task task = taskRepo.findById(taskId)
+			.orElseThrow(() -> new RuntimeException("Task not found"));
+
+		if (!task.getPostedBy().getId().equals(requester.getId())) {
+			throw new RuntimeException("Only task owner can view submission");
+		}
+
+		return submissionRepo.findByTaskId(taskId)
+			.orElseThrow(() -> new RuntimeException("Submission not found"));
+	}
+
 }
 
