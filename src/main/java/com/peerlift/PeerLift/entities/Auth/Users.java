@@ -89,4 +89,8 @@ public class Users implements UserDetails {
 		updatedAt = LocalDateTime.now();
 	}
 
+	private int credits = 0;
+	private int tasksCompleted = 0;
+	private double rating = 0.0;
+
 }

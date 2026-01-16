@@ -60,6 +60,9 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.requestMatchers("/api/v1/auth/**").permitAll()
+				.requestMatchers("/api/v1/tasks").permitAll()
+				.requestMatchers("/api/v1/leaderboard/**").permitAll()
+				.requestMatchers("/api/v1/tasks/**").permitAll()
 				.anyRequest().authenticated())
 			.authenticationProvider(authenticationProvider)
 			.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
