@@ -11,13 +11,15 @@ const Home = () => {
             <div className="flex gap-4">
                 <Link
                     to="/login"
-                    className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 transition"
+                    className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow
+                    hover:bg-blue-700 transition"
                 >
                     Login
                 </Link>
                 <Link
                     to="/register"
-                    className="px-6 py-3 bg-white text-blue-600 font-medium border border-blue-600 rounded-lg shadow-sm hover:bg-gray-50 transition"
+                    className="px-6 py-3 bg-white text-blue-600 font-medium border
+                    border-blue-600 rounded-lg shadow-sm hover:bg-gray-50 transition"
                 >
                     Register
                 </Link>
