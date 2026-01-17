@@ -1,11 +1,14 @@
 package com.peerlift.PeerLift.security;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("google")
 public class GoogleTokenVerifier {
 
 	private final JwtDecoder jwtDecoder;

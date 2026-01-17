@@ -5,6 +5,8 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -38,5 +40,12 @@ public class Submission {
 	private List<String> imageUrls;
 
 	private Integer rating;
+
+	@Enumerated(EnumType.STRING)
+	private SubmissionStatus status = SubmissionStatus.PENDING;
+
+	@Column(length = 1000)
+	private String feedback;
+
 }
 

@@ -1,8 +1,10 @@
 package com.peerlift.PeerLift.service.task;
 
 import com.peerlift.PeerLift.dto.task.CreateTaskRequest;
+import com.peerlift.PeerLift.dto.task.ReviewSubmissionRequest;
 import com.peerlift.PeerLift.entities.Auth.Users;
 import com.peerlift.PeerLift.entities.Task.Submission;
+import com.peerlift.PeerLift.entities.Task.SubmissionStatus;
 import com.peerlift.PeerLift.entities.Task.Task;
 import com.peerlift.PeerLift.entities.Task.TaskStatus;
 import com.peerlift.PeerLift.repository.SubmissionRepository;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -25,13 +26,20 @@ public class TaskService {
 	private final SubmissionRepository submissionRepo;
 	private final userRepository userRepo;
 
-	public Task createTask(CreateTaskRequest req, Users user) {
+	public Task createTask(
+		CreateTaskRequest req,
+		List<String> imageUrls,
+		Users user
+	) {
 		Task task = new Task();
 		task.setTitle(req.title());
 		task.setDescription(req.description());
 		task.setSubject(req.subject());
 		task.setRewardCredits(req.rewardCredits());
 		task.setPostedBy(user);
+		task.setImageUrls(imageUrls);
+		task.setStatus(TaskStatus.OPEN);
+
 		return taskRepo.save(task);
 	}
 
@@ -75,12 +83,9 @@ public class TaskService {
 		Submission submission = new Submission();
 		submission.setTask(task);
 		submission.setSubmittedBy(user);
-		submission.setImageUrls(Collections.singletonList(String.valueOf(imageUrls)));
+		submission.setImageUrls(imageUrls);
 
 		submissionRepo.save(submission);
-
-		task.setStatus(TaskStatus.COMPLETED);
-		task.setCompletedAt(LocalDateTime.now());
 		taskRepo.save(task);
 	}
 
@@ -134,6 +139,48 @@ public class TaskService {
 
 		return submissionRepo.findByTaskId(taskId)
 			.orElseThrow(() -> new RuntimeException("Submission not found"));
+	}
+
+	public void reviewSubmission(
+		Long taskId,
+		ReviewSubmissionRequest req,
+		Users reviewer
+	) {
+		Task task = taskRepo.findById(taskId)
+			.orElseThrow(() -> new RuntimeException("Task not found"));
+
+		if (!task.getPostedBy().getId().equals(reviewer.getId())) {
+			throw new RuntimeException("Only task owner can review");
+		}
+
+		Submission submission = submissionRepo.findByTaskId(taskId)
+			.orElseThrow(() -> new RuntimeException("Submission not found"));
+
+		if (submission.getStatus() != SubmissionStatus.PENDING) {
+			throw new RuntimeException("Submission already reviewed");
+		}
+
+		submission.setStatus(req.status());
+		submission.setFeedback(req.feedback());
+
+		if (req.status() == SubmissionStatus.APPROVED) {
+			task.setStatus(TaskStatus.COMPLETED);
+			task.setCompletedAt(LocalDateTime.now());
+
+			Users solver = submission.getSubmittedBy();
+			solver.setCredits(solver.getCredits() + task.getRewardCredits());
+			solver.setTasksCompleted(solver.getTasksCompleted() + 1);
+
+			int completed = solver.getTasksCompleted();
+			double newRating =
+				((solver.getRating() * (completed - 1)) + submission.getRating()) / completed;
+
+			solver.setRating(newRating);
+			userRepo.save(solver);
+		}
+
+		submissionRepo.save(submission);
+		taskRepo.save(task);
 	}
 
 }

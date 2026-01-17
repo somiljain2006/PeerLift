@@ -2,6 +2,7 @@ package com.peerlift.PeerLift.controller;
 
 import com.peerlift.PeerLift.dto.ApiResponse;
 import com.peerlift.PeerLift.dto.task.RateSubmissionRequest;
+import com.peerlift.PeerLift.dto.task.ReviewSubmissionRequest;
 import com.peerlift.PeerLift.dto.task.SubmissionResponse;
 import com.peerlift.PeerLift.entities.Auth.Users;
 import com.peerlift.PeerLift.entities.Task.Submission;
@@ -70,6 +71,18 @@ public class SubmissionController {
 
 		return ResponseEntity.ok(
 			new ApiResponse<>(200, "Submission fetched", response)
+		);
+	}
+
+	@PostMapping("/{taskId}/review")
+	public ResponseEntity<ApiResponse<String>> reviewSubmission(
+		@PathVariable Long taskId,
+		@RequestBody ReviewSubmissionRequest request
+	) {
+		Users user = SecurityUtil.currentUser();
+		taskService.reviewSubmission(taskId, request, user);
+		return ResponseEntity.ok(
+			new ApiResponse<>(200, "Submission reviewed", null)
 		);
 	}
 
