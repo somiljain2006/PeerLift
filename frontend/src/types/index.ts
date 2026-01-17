@@ -4,6 +4,12 @@ export enum TaskStatus {
     COMPLETED = 'COMPLETED',
 }
 
+export enum SubmissionStatus {
+    PENDING = 'PENDING',
+    APPROVED = 'APPROVED',
+    REJECTED = 'REJECTED'
+}
+
 export interface User {
     id: string;
     username: string;
@@ -23,6 +29,7 @@ export interface Task {
     postedBy?: User;
     acceptedBy?: User;
     createdAt: string;
+    imageUrls: string[];
 }
 
 export interface Submission {
@@ -30,4 +37,6 @@ export interface Submission {
     submittedBy: string;
     imageUrls: string[];
     rating?: number;
+    status: SubmissionStatus;
+    feedback?: string;
 }

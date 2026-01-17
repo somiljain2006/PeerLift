@@ -14,7 +14,8 @@ import java.util.UUID;
 @Service
 public class ImageStorageService {
 
-	private static final String BASE_DIR = "uploads/solutions";
+	private static final String BASE_DIR =
+		System.getProperty("user.dir") + "/uploads/solutions";
 
 	public List<String> saveImages(List<MultipartFile> files) {
 

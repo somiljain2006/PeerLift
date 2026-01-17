@@ -63,6 +63,8 @@ public class SecurityConfig {
 				.requestMatchers("/api/v1/tasks").permitAll()
 				.requestMatchers("/api/v1/leaderboard/**").permitAll()
 				.requestMatchers("/api/v1/tasks/**").permitAll()
+				.requestMatchers("/uploads/**").permitAll()
+				.requestMatchers("/api/v1/tasks/open").permitAll()
 				.anyRequest().authenticated())
 			.authenticationProvider(authenticationProvider)
 			.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)

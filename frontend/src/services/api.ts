@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { SubmissionStatus } from '../types';
 
 const API_URL = 'http://localhost:8080/api/v1';
 
@@ -59,8 +60,8 @@ export const authService = {
         data),
 
     googleLogin: (idToken: string) => api.post('/auth/google', { idToken }),
-    forgotPassword: (email: string) =>
-        api.post('/auth/forgotPassword', { email }),
+    forgotPassword: (email: string) => api.post('/auth/forgotPassword',
+        { email }),
 
     validateForgotOtp: (data: { email: string; otp: string }) =>
         api.post('/auth/validateForgotPassword', data),
@@ -75,8 +76,21 @@ export const authService = {
 };
 
 export const taskService = {
-    createTask: (data: { title: string; description: string; subject: string;
-        rewardCredits: number }) => api.post('/tasks', data),
+    createTask: (data: { title: string; description: string; subject: string; rewardCredits: number }, images?:
+    File[]) => {
+        const formData = new FormData();
+
+        const jsonBlob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+        formData.append('data', jsonBlob);
+
+        if (images) {
+            images.forEach((file) => formData.append('images', file));
+        }
+
+        return api.post('/tasks', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+    },
 
     getOpenTasks: () => api.get('/tasks/open'),
 
@@ -85,6 +99,9 @@ export const taskService = {
     getMyAcceptedTasks: () => api.get('/tasks/my-accepted'),
 
     acceptTask: (taskId: number) => api.post(`/tasks/${taskId}/accept`),
+
+    reviewSubmission: (taskId: number, status: SubmissionStatus, feedback: string) =>
+        api.post(`/submissions/${taskId}/review`, { status, feedback }),
 };
 
 export const submissionService = {
